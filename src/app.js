@@ -1,4 +1,11 @@
 "use strict";
+// var AWS = require("aws-sdk");
+// import {
+//     ReceiveMessageCommand,
+//     DeleteMessageCommand,
+//     SQSClient,
+//     DeleteMessageBatchCommand,
+//   } from "@aws-sdk/client-sqs";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -35,69 +42,147 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
-    }
-    return to.concat(ar || Array.prototype.slice.call(from));
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.main = void 0;
-var AWS = require("aws-sdk");
 var client_sqs_1 = require("@aws-sdk/client-sqs");
-AWS.config.update({ region: "ap-south-1" });
-var client = new client_sqs_1.SQSClient({});
-var SQS_QUEUE_URL = "queue_url";
-var receiveMessage = function (queueUrl) {
-    return client.send(new client_sqs_1.ReceiveMessageCommand({
-        MaxNumberOfMessages: 10,
-        MessageAttributeNames: ["All"],
-        QueueUrl: queueUrl,
-        WaitTimeSeconds: 20,
-        VisibilityTimeout: 20,
-    }));
-};
-var main = function () {
-    var args_1 = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-        args_1[_i] = arguments[_i];
-    }
-    return __awaiter(void 0, __spreadArray([], args_1, true), void 0, function (queueUrl) {
-        var Messages;
-        if (queueUrl === void 0) { queueUrl = SQS_QUEUE_URL; }
+// AWS.config.update({ region: "ap-south-1" });
+// const client = new SQSClient({});
+// const SQS_QUEUE_URL = "https://sqs.ap-south-1.amazonaws.com/543446359042/SQS-demo";
+// const receiveMessage = (queueUrl: string) =>
+//     client.send(
+//       new ReceiveMessageCommand({
+//         MaxNumberOfMessages: 10,
+//         MessageAttributeNames: ["All"],
+//         QueueUrl: queueUrl,
+//         WaitTimeSeconds: 20,
+//         VisibilityTimeout: 20,
+//       }),
+//     );
+//     var params = {
+//         AttributeNames: ["SentTimestamp"],
+//         MaxNumberOfMessages: 10,
+//         MessageAttributeNames: ["All"],
+//         QueueUrl: SQS_QUEUE_URL,
+//         VisibilityTimeout: 20,
+//         WaitTimeSeconds: 0,
+//       };
+//       sqs.receiveMessage(params, function (err, data) {
+//         if (err) {
+//           console.log("Receive Error", err);
+//         } else if (data.Messages) {
+//           var deleteParams = {
+//             QueueUrl: queueURL,
+//             ReceiptHandle: data.Messages[0].ReceiptHandle,
+//           };
+//           sqs.deleteMessage(deleteParams, function (err, data) {
+//             if (err) {
+//               console.log("Delete Error", err);
+//             } else {
+//               console.log("Message Deleted", data);
+//             }
+//           });
+//         }
+//       });
+//     export const main = async (queueUrl = SQS_QUEUE_URL) => {
+//         const { Messages } = await receiveMessage(queueUrl);
+//         console.log("message are ")
+//         console.log("message is ",Messages)
+//         if (!Messages) {
+//             console.log("message is ",Messages)
+//           return;
+//         }
+//         // if (Messages.length === 1) {
+//         //   console.log(Messages[0].Body);
+//         //   await client.send(
+//         //     new DeleteMessageCommand({
+//         //       QueueUrl: queueUrl,
+//         //       ReceiptHandle: Messages[0].ReceiptHandle,
+//         //     }),
+//         //   );
+//         // } else {
+//         //   await client.send(
+//         //     new DeleteMessageBatchCommand({
+//         //       QueueUrl: queueUrl,
+//         //       Entries: Messages.map((message:any) => ({
+//         //         Id: message.MessageId,
+//         //         ReceiptHandle: message.ReceiptHandle,
+//         //       })),
+//         //     }),
+//         //   );
+//         // }
+//       };
+var client_sqs_2 = require("@aws-sdk/client-sqs");
+var client = new client_sqs_2.SQSClient({});
+var SQS_QUEUE_URL = "https://sqs.ap-south-1.amazonaws.com/543446359042/SQS-demo";
+function SendMsg(i) {
+    return __awaiter(this, void 0, void 0, function () {
+        var sendMessageParams, sendMessageCommand, response;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, receiveMessage(queueUrl)];
+                case 0:
+                    console.log("Sending message for ".concat(i));
+                    sendMessageParams = {
+                        QueueUrl: SQS_QUEUE_URL,
+                        MessageBody: "Message from nodejs" + i.toString(),
+                        DelaySeconds: 5,
+                        MessageAttributes: {
+                            attr1: {
+                                DataType: "String",
+                                StringValue: "value" + i.toString(),
+                            },
+                            attr2: {
+                                DataType: "String",
+                                StringValue: "value" + i.toString(),
+                            },
+                            attr3: {
+                                DataType: "String",
+                                StringValue: "value" + i.toString(),
+                            },
+                        },
+                    };
+                    sendMessageCommand = new client_sqs_2.SendMessageCommand(sendMessageParams);
+                    return [4 /*yield*/, client.send(sendMessageCommand).then(function (res) {
+                            console.log(res);
+                        }).catch(function (err) {
+                            console.log(err);
+                        })];
                 case 1:
-                    Messages = (_a.sent()).Messages;
-                    if (!Messages) {
-                        return [2 /*return*/];
-                    }
-                    if (!(Messages.length === 1)) return [3 /*break*/, 3];
-                    console.log(Messages[0].Body);
-                    return [4 /*yield*/, client.send(new client_sqs_1.DeleteMessageCommand({
-                            QueueUrl: queueUrl,
-                            ReceiptHandle: Messages[0].ReceiptHandle,
-                        }))];
-                case 2:
-                    _a.sent();
-                    return [3 /*break*/, 5];
-                case 3: return [4 /*yield*/, client.send(new client_sqs_1.DeleteMessageBatchCommand({
-                        QueueUrl: queueUrl,
-                        Entries: Messages.map(function (message) { return ({
-                            Id: message.MessageId,
-                            ReceiptHandle: message.ReceiptHandle,
-                        }); }),
-                    }))];
-                case 4:
-                    _a.sent();
-                    _a.label = 5;
-                case 5: return [2 /*return*/];
+                    response = _a.sent();
+                    console.log(response);
+                    return [2 /*return*/];
             }
         });
     });
-};
-exports.main = main;
+}
+function ReceiveMsg() {
+    return __awaiter(this, void 0, void 0, function () {
+        var receiveMessageParams, receiveMessageCommand, response;
+        return __generator(this, function (_a) {
+            receiveMessageParams = {
+                MaxNumberOfMessages: 10,
+                MessageAttributeNames: ["All"],
+                QueueUrl: SQS_QUEUE_URL,
+                WaitTimeSeconds: 20,
+            };
+            receiveMessageCommand = new client_sqs_1.ReceiveMessageCommand(receiveMessageParams);
+            response = client.send(receiveMessageCommand).then(function (res) {
+                var _a;
+                console.log(res);
+                console.log("message length is ", (_a = res.Messages) === null || _a === void 0 ? void 0 : _a.length);
+            }).catch(function (err) {
+                console.log(err);
+            });
+            return [2 /*return*/];
+        });
+    });
+}
+// async function SendMsgBatch(){
+//      const sendBatchParams  : SendMessageBatchRequest ={
+//          QueueUrl:SQS_QUEUE_URL,
+//      }
+// }
+// for (let i = 0; i < 100; i++) {
+//     console.log(i);
+//     SendMsg(i);
+// }
+//SendMsg(7);
+ReceiveMsg();
