@@ -6,7 +6,7 @@
 //     DeleteMessageBatchCommand,
 //   } from "@aws-sdk/client-sqs";
 
-import { DeleteMessageRequest, ReceiveMessageCommand, ReceiveMessageRequest, SendMessageBatchRequest, SendMessageRequest } from "@aws-sdk/client-sqs";
+import { DeleteMessageBatchCommand, DeleteMessageBatchCommandInput, DeleteMessageCommand, DeleteMessageRequest, ReceiveMessageCommand, ReceiveMessageRequest, SendMessageBatchRequest, SendMessageRequest } from "@aws-sdk/client-sqs";
 import { send } from "process";
 
 // AWS.config.update({ region: "ap-south-1" });
@@ -85,6 +85,7 @@ import { send } from "process";
 //       };
 
 import { SendMessageCommand, SQSClient } from "@aws-sdk/client-sqs";
+import { DeleteMessageBatchRequest } from "aws-sdk/clients/sqs";
 
 const client: SQSClient = new SQSClient({});
 
@@ -142,24 +143,19 @@ async function ReceiveMsg(){
         WaitTimeSeconds: 20,
       };
 
-
    const receiveMessageCommand : ReceiveMessageCommand = new ReceiveMessageCommand(receiveMessageParams);
-   const  response =  client.send(receiveMessageCommand).then(
-    res=>{
-        console.log(res);
-        console.log("message length is " , res.Messages?.length)
+   try{
+    const response = await client.send(receiveMessageCommand);
+    console.log("Message array length",response.Messages?.length)
+    return response.Messages;
+   }
+   catch (err) {
+    console.log(err);
+    throw err;
     }
-   ).catch(
-    err=>{
-        console.log(err);
-    }
-   );
- 
-
-
 }
 
-async function Deletemsg(receiptHandle : string){
+async function Deletemsg(receiptHandle : string|undefined){
 
   const deleteMessageParams: DeleteMessageRequest= {
   QueueUrl :SQS_QUEUE_URL,
@@ -167,9 +163,9 @@ async function Deletemsg(receiptHandle : string){
   };
 
 
-const receiveMessageCommand : ReceiveMessageCommand = new ReceiveMessageCommand(deleteMessageParams);
+const deleteMessageCommand : DeleteMessageCommand = new DeleteMessageCommand(deleteMessageParams);
 
-const  response =  client.send(receiveMessageCommand).then(
+const  response =  client.send(deleteMessageCommand).then(
     res=>{
       console.log(res)
     }
@@ -181,24 +177,56 @@ const  response =  client.send(receiveMessageCommand).then(
 
 }
 
+async function DeleteMsgsBatch(messages : any){
+console.log("messages from function,,,", messages)
+  const deleteMessageBatchParams: DeleteMessageBatchRequest= {
+  QueueUrl :SQS_QUEUE_URL,
+  Entries :  messages.map( 
+ (message:any) =>({
+     Id : message.MessageId,
+     ReceiptHandle : message.ReceiptHandle,
 
+ })
 
+  )
+  };
 
-// async function SendMsgBatch(){
+console.log("deleteMessageBatchParams", deleteMessageBatchParams)
+const deleteMessageBatchCommand : DeleteMessageBatchCommand = new DeleteMessageBatchCommand(deleteMessageBatchParams);
 
-//      const sendBatchParams  : SendMessageBatchRequest ={
-//          QueueUrl:SQS_QUEUE_URL,
+const  response =  client.send(deleteMessageBatchCommand).then(
+    res=>{
+      console.log(res)
+    }
+  ).catch(
+    err=>{
+      console.log(err)
+    }
+);
 
+}
 
-//      }
-
-// }
+async function PollMessages(){
+    
+   try{
+    let messages = await ReceiveMsg()
+    if(messages){
+      if(messages.length ===1){
+        Deletemsg(messages[0].ReceiptHandle);
+      }else{
+        DeleteMsgsBatch(messages);
+      }
+    }
+   } catch (error) {
+        console.error('Error receiving messages:', error);
+    }
+}
 
 // for (let i = 0; i < 100; i++) {
 //     console.log(i);
 //     SendMsg(i);
 // }
 //SendMsg(7);
-ReceiveMsg();
+//ReceiveMsg();
 
-Deletemsg();
+PollMessages();

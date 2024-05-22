@@ -112,7 +112,7 @@ var client_sqs_1 = require("@aws-sdk/client-sqs");
 //       };
 var client_sqs_2 = require("@aws-sdk/client-sqs");
 var client = new client_sqs_2.SQSClient({});
-var SQS_QUEUE_URL = "https://sqs.ap-south-1.amazonaws.com/543446359042/SQS-demo";
+var SQS_QUEUE_URL = "https://sqs.ap-south-1.amazonaws.com/543446359042/SQS-dem";
 function SendMsg(i) {
     return __awaiter(this, void 0, void 0, function () {
         var sendMessageParams, sendMessageCommand, response;
@@ -155,19 +155,46 @@ function SendMsg(i) {
 }
 function ReceiveMsg() {
     return __awaiter(this, void 0, void 0, function () {
-        var receiveMessageParams, receiveMessageCommand, response;
+        var receiveMessageParams, receiveMessageCommand, response, err_1;
+        var _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    receiveMessageParams = {
+                        MaxNumberOfMessages: 10,
+                        MessageAttributeNames: ["All"],
+                        QueueUrl: SQS_QUEUE_URL,
+                        WaitTimeSeconds: 20,
+                    };
+                    receiveMessageCommand = new client_sqs_1.ReceiveMessageCommand(receiveMessageParams);
+                    _b.label = 1;
+                case 1:
+                    _b.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, client.send(receiveMessageCommand)];
+                case 2:
+                    response = _b.sent();
+                    console.log("Message array length", (_a = response.Messages) === null || _a === void 0 ? void 0 : _a.length);
+                    return [2 /*return*/, response.Messages];
+                case 3:
+                    err_1 = _b.sent();
+                    console.log(err_1);
+                    throw err_1;
+                case 4: return [2 /*return*/];
+            }
+        });
+    });
+}
+function Deletemsg(receiptHandle) {
+    return __awaiter(this, void 0, void 0, function () {
+        var deleteMessageParams, deleteMessageCommand, response;
         return __generator(this, function (_a) {
-            receiveMessageParams = {
-                MaxNumberOfMessages: 10,
-                MessageAttributeNames: ["All"],
+            deleteMessageParams = {
                 QueueUrl: SQS_QUEUE_URL,
-                WaitTimeSeconds: 20,
+                ReceiptHandle: receiptHandle
             };
-            receiveMessageCommand = new client_sqs_1.ReceiveMessageCommand(receiveMessageParams);
-            response = client.send(receiveMessageCommand).then(function (res) {
-                var _a;
+            deleteMessageCommand = new client_sqs_1.DeleteMessageCommand(deleteMessageParams);
+            response = client.send(deleteMessageCommand).then(function (res) {
                 console.log(res);
-                console.log("message length is ", (_a = res.Messages) === null || _a === void 0 ? void 0 : _a.length);
             }).catch(function (err) {
                 console.log(err);
             });
@@ -175,14 +202,61 @@ function ReceiveMsg() {
         });
     });
 }
-// async function SendMsgBatch(){
-//      const sendBatchParams  : SendMessageBatchRequest ={
-//          QueueUrl:SQS_QUEUE_URL,
-//      }
-// }
+function DeleteMsgsBatch(messages) {
+    return __awaiter(this, void 0, void 0, function () {
+        var deleteMessageBatchParams, deleteMessageBatchCommand, response;
+        return __generator(this, function (_a) {
+            console.log("messages from function,,,", messages);
+            deleteMessageBatchParams = {
+                QueueUrl: SQS_QUEUE_URL,
+                Entries: messages.map(function (message) { return ({
+                    Id: message.MessageId,
+                    ReceiptHandle: message.ReceiptHandle,
+                }); })
+            };
+            console.log("deleteMessageBatchParams", deleteMessageBatchParams);
+            deleteMessageBatchCommand = new client_sqs_1.DeleteMessageBatchCommand(deleteMessageBatchParams);
+            response = client.send(deleteMessageBatchCommand).then(function (res) {
+                console.log(res);
+            }).catch(function (err) {
+                console.log(err);
+            });
+            return [2 /*return*/];
+        });
+    });
+}
+function PollMessages() {
+    return __awaiter(this, void 0, void 0, function () {
+        var messages, error_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 2, , 3]);
+                    return [4 /*yield*/, ReceiveMsg()];
+                case 1:
+                    messages = _a.sent();
+                    if (messages) {
+                        if (messages.length === 1) {
+                            Deletemsg(messages[0].ReceiptHandle);
+                        }
+                        else {
+                            DeleteMsgsBatch(messages);
+                        }
+                    }
+                    return [3 /*break*/, 3];
+                case 2:
+                    error_1 = _a.sent();
+                    console.error('Error receiving messages:', error_1);
+                    return [3 /*break*/, 3];
+                case 3: return [2 /*return*/];
+            }
+        });
+    });
+}
 // for (let i = 0; i < 100; i++) {
 //     console.log(i);
 //     SendMsg(i);
 // }
 //SendMsg(7);
-ReceiveMsg();
+//ReceiveMsg();
+PollMessages();

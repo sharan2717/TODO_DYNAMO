@@ -5,6 +5,10 @@
     "main": "index.js",
     "scripts": {
         "start": "tsc src/app.ts && node src/app.js",
+        "start-sns": "tsc src/sns.ts && node src/sns.js",
+        "start-sqs": "tsc src/sqs.ts && node src/sqs.js",
+
+
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "keywords": [],
