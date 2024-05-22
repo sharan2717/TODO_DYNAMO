@@ -6,7 +6,7 @@
 //     DeleteMessageBatchCommand,
 //   } from "@aws-sdk/client-sqs";
 
-import { ReceiveMessageCommand, ReceiveMessageRequest, SendMessageBatchRequest, SendMessageRequest } from "@aws-sdk/client-sqs";
+import { DeleteMessageRequest, ReceiveMessageCommand, ReceiveMessageRequest, SendMessageBatchRequest, SendMessageRequest } from "@aws-sdk/client-sqs";
 import { send } from "process";
 
 // AWS.config.update({ region: "ap-south-1" });
@@ -159,6 +159,30 @@ async function ReceiveMsg(){
 
 }
 
+async function Deletemsg(receiptHandle : string){
+
+  const deleteMessageParams: DeleteMessageRequest= {
+  QueueUrl :SQS_QUEUE_URL,
+  ReceiptHandle :receiptHandle
+  };
+
+
+const receiveMessageCommand : ReceiveMessageCommand = new ReceiveMessageCommand(deleteMessageParams);
+
+const  response =  client.send(receiveMessageCommand).then(
+    res=>{
+      console.log(res)
+    }
+  ).catch(
+    err=>{
+      console.log(err)
+    }
+);
+
+}
+
+
+
 
 // async function SendMsgBatch(){
 
@@ -176,3 +200,5 @@ async function ReceiveMsg(){
 // }
 //SendMsg(7);
 ReceiveMsg();
+
+Deletemsg();
