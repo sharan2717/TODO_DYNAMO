@@ -7,18 +7,19 @@
         "start": "tsc src/app.ts && node src/app.js",
         "start-sns": "tsc src/sns.ts && node src/sns.js",
         "start-sqs": "tsc src/sqs.ts && node src/sqs.js",
-
-
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "keywords": [],
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "@aws-sdk/client-sfn": "^3.583.0",
+        "@aws-sdk/client-sns": "^3.583.0",
         "@aws-sdk/client-sqs": "^3.577.0",
         "@types/aws-sdk": "^2.7.0",
         "@types/uuid": "^9.0.8",
         "aws-sdk": "^2.1620.0",
+        "dotenv": "^16.4.5",
         "express": "^4.19.2",
         "mongodb": "^6.6.1",
         "serverless-http": "^3.2.0"

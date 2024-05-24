@@ -1,16 +1,4 @@
-import { SFNClient, StartExecutionCommand,CreateStateMachineCommand, CreateStateMachineInput, ValidateStateMachineDefinitionCommand, CreateStateMachineCommandOutput } from "@aws-sdk/client-sfn";
-import { Arn, CreateStateMachineOutput, StartExecutionInput } from "aws-sdk/clients/stepfunctions";
-require('dotenv').config();
-const fs = require('fs').promises;
-const path = require('path');
-
-
-const region =process.env.region;
-const roleArn = "arn:aws:iam::543446359042:role/service-role/StepFunctions-MyStateMachine-ukq8x1mo1-role-r8kscwbwr"
-
-const client:SFNClient = new SFNClient({ region });
-
-const machineDefinition = {
+{
     "Comment": "A Hello World example demonstrating various state types of the Amazon States Language. It is composed of flow control states only, so it does not need resources to run.",
     "StartAt": "Pass",
     "States": {
@@ -84,39 +72,3 @@ const machineDefinition = {
       }
     }
   }
-
-const createStateMachineParams:CreateStateMachineInput ={
- name :"MachineFromNodeJS",
- roleArn:roleArn,
- definition:JSON.stringify(machineDefinition),
-}
-
-const startExecutionParams = (stateMachineArn : Arn )=>{
-    const startExecutionParams : StartExecutionInput={
-   stateMachineArn:stateMachineArn,
-   name:"ExecutionfromNOdejs"
-   //input: JSON.stringify({ name: "John Doe" })
-
-}
-    return startExecutionParams
-}
-
-async function CreateStateMachine() {
-
-    try{
-      const createStateMachineCommand : CreateStateMachineCommand = new CreateStateMachineCommand( createStateMachineParams)
-      const response :CreateStateMachineCommandOutput= await client.send(createStateMachineCommand)
-      console.log("response " , response)
-      const stateMachineArn: string | undefined  = response.stateMachineArn
-      if(stateMachineArn){
-        const startExecutionCommand  : StartExecutionCommand = new StartExecutionCommand(startExecutionParams(stateMachineArn) )
-        const startResponse = await client.send(startExecutionCommand);
-        console.log( " startResponse is" , startResponse)  
-    }
-    }catch(err){
-        console.error("Error:", err);
-    }
-    
-}
-
-CreateStateMachine();
