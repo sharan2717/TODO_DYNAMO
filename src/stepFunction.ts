@@ -94,7 +94,7 @@ const createStateMachineParams:CreateStateMachineInput ={
 const startExecutionParams = (stateMachineArn : Arn )=>{
     const startExecutionParams : StartExecutionInput={
    stateMachineArn:stateMachineArn,
-   name:"ExecutionfromNOdejs"
+   name:"PersonalLAP"
    //input: JSON.stringify({ name: "John Doe" })
 
 }

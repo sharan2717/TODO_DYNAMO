@@ -125,7 +125,7 @@ var createStateMachineParams = {
 var startExecutionParams = function (stateMachineArn) {
     var startExecutionParams = {
         stateMachineArn: stateMachineArn,
-        name: "ExecutionfromNOdejs"
+        name: "PersonalLAP"
         //input: JSON.stringify({ name: "John Doe" })
     };
     return startExecutionParams;
