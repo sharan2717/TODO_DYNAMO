@@ -1,0 +1,20 @@
+dyamodb struct
+  
+   productId
+   productname
+   productdesc
+   quantity
+   price
+
+orders
+ orderId
+ amount
+ productId
+ status
+ quantity
+ orderDate
+
+
+1.list products
+2.order product(buynow)
+3.
