@@ -9,8 +9,8 @@
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk",
-  "build:lambda": "tsc -p resources/tsconfig.json && xcopy package.json build\\ && cd build && npm install --production",
-"build:cdk" : "build:lambda && cdk deploy"
+  "build:lambda": "tsc -p resources/tsconfig.json && xcopy package.json build\\ && cd build && npm install --production"
+
 
   },
   "devDependencies": {

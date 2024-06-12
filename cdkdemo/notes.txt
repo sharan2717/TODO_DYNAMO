@@ -1,16 +1,16 @@
 dyamodb struct
   
    productId
-   productname
-   productdesc
-   quantity
+   productname : string
+   productdesc : string
+   quantity  : number
    price
 
 orders
  orderId
  amount
  productId
- status
+ status : string
  quantity
  orderDate
 
